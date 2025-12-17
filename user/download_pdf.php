@@ -2,34 +2,36 @@
 session_start();
 require_once "../config/database.php";
 
-// Proteksi user
-if (!isset($_SESSION['user_nik'])) {
-    die("Akses ditolak");
+// proteksi login
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_nik'])) {
+    header("Location: login.php");
+    exit;
 }
 
-$nik_hash = $_SESSION['user_nik'];
+$nik = $_SESSION['user_nik'];
+$nik_hash = hash('sha256', $nik);
 
-// Ambil nama file dari database
-$q = mysqli_query($conn,
-    "SELECT file_pdf FROM pasien WHERE nik_hash='$nik_hash'"
-);
-
-$data = mysqli_fetch_assoc($q);
+// ambil file pdf berdasarkan nik user
+$stmt = mysqli_prepare($conn, "SELECT file_pdf FROM pasien WHERE nik_hash = ?");
+mysqli_stmt_bind_param($stmt, "s", $nik_hash);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
 
 if (!$data || empty($data['file_pdf'])) {
-    die("File PDF belum tersedia");
+    die("File rekam medis tidak ditemukan.");
 }
 
-// PATH SESUAI KEBUTUHANMU
-$file = __DIR__ . "/../pdf/files/" . $data['file_pdf'];
+$file = "../pdf/files/" . basename($data['file_pdf']);
 
 if (!file_exists($file)) {
-    die("File PDF tidak tersedia di server");
+    die("File PDF tidak tersedia di server.");
 }
 
-// Kirim PDF ke browser
 header("Content-Type: application/pdf");
-header("Content-Disposition: inline; filename=\"".$data['file_pdf']."\"");
+header("Content-Disposition: attachment; filename=\"rekam_medis_$nik.pdf\"");
 header("Content-Length: " . filesize($file));
+
 readfile($file);
 exit;
+

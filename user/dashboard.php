@@ -2,14 +2,21 @@
 session_start();
 require_once "../config/database.php";
 
-if (!isset($_SESSION['user_nik'])) {
+// proteksi halaman
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_nik'])) {
     header("Location: login.php");
     exit;
 }
 
-$nik_hash = $_SESSION['user_nik'];
-$q = mysqli_query($conn, "SELECT file_pdf FROM pasien WHERE nik_hash='$nik_hash'");
-$data = mysqli_fetch_assoc($q);
+$nik = $_SESSION['user_nik'];
+$nik_hash = hash('sha256', $nik);
+
+// ambil data rekam medis pasien
+$stmt = mysqli_prepare($conn, "SELECT file_pdf FROM pasien WHERE nik_hash = ?");
+mysqli_stmt_bind_param($stmt, "s", $nik_hash);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$data = mysqli_fetch_assoc($result);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -44,6 +51,8 @@ body {
     color: white;
     text-decoration: none;
     border-radius: 6px;
+    border: none;
+    cursor: pointer;
 }
 .logout {
     background: #e74c3c;
@@ -51,6 +60,13 @@ body {
 .footer {
     margin-top: 40px;
     color: #777;
+}
+.info {
+    background: #ecf0f1;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 14px;
 }
 </style>
 </head>
@@ -63,12 +79,25 @@ body {
 <div class="container">
     <div class="card">
         <h3>Rekam Medis Anda</h3>
-        <p>Data rekam medis Anda tersimpan aman dan terenkripsi di sistem.</p>
+
+        <p>
+            Data rekam medis Anda tersimpan aman dalam bentuk terenkripsi
+            dan hanya dapat diakses oleh Anda dan tenaga medis berwenang.
+        </p>
 
         <?php if ($data && $data['file_pdf']): ?>
-            <a href="download_pdf.php" class="btn">⬇ Download Rekam Medis (PDF)</a>
+            <form action="send_token_email.php" method="POST">
+                <label><b>Email tujuan unduhan</b></label>
+                <input type="email" name="email" required
+                    placeholder="contoh@email.com"
+                    style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:1px solid #ccc">
+
+                <button type="submit" class="btn">
+                    Kirim Link Download ke Email
+                </button>
+            </form>
         <?php else: ?>
-            <p><i>PDF belum tersedia</i></p>
+            <p><i>Rekam medis belum tersedia</i></p>
         <?php endif; ?>
 
         <br><br>

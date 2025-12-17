@@ -107,6 +107,24 @@ button {
     cursor: pointer;
 }
 
+.view-btn {
+    border: 3px solid #ff4081;
+    background: #ffd1e3;
+    padding: 12px 30px;
+    border-radius: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    margin-right: 15px;
+}
+
+.view-btn:hover {
+    background: #ff4081;
+    color: white;
+}
+
+
 button:hover {
     background: #ff4081;
     color: white;
@@ -121,6 +139,9 @@ button:hover {
 </div>
 
 <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <a href="decrypt_pasien.php" class="view-btn">📋 Lihat Data Pasien</a>
+    </div>
     <div class="title">Input Rekam Medis Pasien</div>
 
     <form method="POST" action="../process/simpan_pasien.php">

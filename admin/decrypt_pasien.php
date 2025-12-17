@@ -57,6 +57,24 @@ body {
     color: black;
 }
 
+.input-btn {
+    border: 3px solid #ff4081;
+    background: #ffe1ec;
+    padding: 10px 30px;
+    border-radius: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+    margin-right: 10px;
+}
+
+.input-btn:hover {
+    background: #ff4081;
+    color: white;
+}
+
+
 .logout-btn:hover {
     background: #ff4081;
     color: white;
@@ -126,9 +144,13 @@ tr:nth-child(odd) {
 </div>
 
 <div class="top-bar">
-    <div></div>
-    <a href="../auth/logout.php" class="logout-btn">Logout</a>
+    <div>
+         <a href="input_pasien.php" class="input-btn">+ Input Data Pasien</a>
+    </div>
+    <a href="../index.php" class="logout-btn">Logout</a>
 </div>
+
+
 
 <div class="table-wrapper">
 <table>

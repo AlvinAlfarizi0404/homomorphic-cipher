@@ -1,0 +1,5 @@
+/vendor/
+/config/email.php
+/pdf/files/
+/pdf/*.pdf
+.env
